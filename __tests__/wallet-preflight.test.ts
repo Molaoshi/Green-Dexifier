@@ -186,6 +186,93 @@ describe("MetaMask impostor handling", () => {
     expect(seenDuring[0]).toBe(realMM);
     expect((win.window as any).ethereum).toBe(realMM);
   });
+
+  it("pin defeats a TronLink-style getter/setter hijack of window.ethereum", async () => {
+    // TronLink 4.x: Object.defineProperties(window, { ethereum: { get, set } })
+    // — the getter always returns ITS provider, the setter swallows/parks
+    // later assigners. Plain assignment can never fix this; the pin must
+    // redefine the property with its own accessor.
+    const tronlinkEvm: any = {
+      isTronLink: true,
+      isMetaMask: true,
+      request: vi.fn(),
+      providers: [],
+    };
+    const realMM = { isMetaMask: true, request: vi.fn() };
+    tronlinkEvm.providers.push(realMM); // real MetaMask parked in .providers
+    win.window = {};
+    Object.defineProperty(win.window, "ethereum", {
+      configurable: true,
+      enumerable: true,
+      get: () => tronlinkEvm,
+      set: (e: any) => {
+        tronlinkEvm.providers.push(e); // hijacker swallows the write
+      },
+    });
+
+    const seenDuring: any[] = [];
+    await withMetaMaskProviderOverride(async () => {
+      seenDuring.push((win.window as any).ethereum);
+      // A hijacker (or anything else) writing during the connect is swallowed
+      (win.window as any).ethereum = { isSomeWallet: true };
+      seenDuring.push((win.window as any).ethereum);
+    });
+
+    expect(seenDuring[0]).toBe(realMM); // getter pinned to strict MetaMask
+    expect(seenDuring[1]).toBe(realMM); // write during pin had no effect
+
+    // Original hijacker descriptor restored afterwards
+    const desc = Object.getOwnPropertyDescriptor(win.window, "ethereum");
+    expect(typeof desc?.get).toBe("function");
+    expect(typeof desc?.set).toBe("function");
+    expect((win.window as any).ethereum).toBe(tronlinkEvm);
+  });
+
+  it("pin restores the hijacker accessor even when the connect throws", async () => {
+    const tronlinkEvm: any = {
+      isTronLink: true,
+      isMetaMask: true,
+      request: vi.fn(),
+      providers: [{ isMetaMask: true, request: vi.fn() }],
+    };
+    win.window = {};
+    Object.defineProperty(win.window, "ethereum", {
+      configurable: true,
+      enumerable: true,
+      get: () => tronlinkEvm,
+      set: () => {},
+    });
+
+    await expect(
+      withMetaMaskProviderOverride(async () => {
+        throw new Error("connect failed");
+      }),
+    ).rejects.toThrow("connect failed");
+    expect((win.window as any).ethereum).toBe(tronlinkEvm); // restored
+  });
+
+  it("pin falls back to connecting as-is when the hijacker property is non-configurable", async () => {
+    const tronlinkEvm: any = {
+      isTronLink: true,
+      isMetaMask: true,
+      request: vi.fn(),
+      providers: [{ isMetaMask: true, request: vi.fn() }],
+    };
+    win.window = {};
+    Object.defineProperty(win.window, "ethereum", {
+      configurable: false, // worst case — cannot be redefined
+      enumerable: true,
+      get: () => tronlinkEvm,
+    });
+
+    const seenDuring: any[] = [];
+    await withMetaMaskProviderOverride(async () => {
+      seenDuring.push((win.window as any).ethereum);
+    });
+    // Couldn't pin — connect ran anyway with whatever owns window.ethereum
+    expect(seenDuring[0]).toBe(tronlinkEvm);
+    expect((win.window as any).ethereum).toBe(tronlinkEvm);
+  });
 });
 
 describe("stuck-request detection (MetaMask -32002)", () => {

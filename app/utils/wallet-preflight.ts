@@ -101,10 +101,19 @@ export const findMetaMaskProvider = (): any => {
 
 // Rango's MetaMask provider reads window.ethereum ONLY (no .providers array,
 // no EIP-6963), so when an impostor owns window.ethereum the MetaMask tile
-// connects to the wrong wallet. While we run MetaMask's connect, point
-// window.ethereum at the strictly-identified MetaMask, then restore. The hub
-// captures the provider reference during connect, so restoring afterwards is
-// safe. No-op when MetaMask isn't installed or already owns window.ethereum.
+// connects to the wrong wallet. Worse, hijackers like TronLink 4.x install a
+// getter/setter via Object.defineProperties: plain assignment
+// (`window.ethereum = real`) is swallowed by their setter and the getter
+// keeps returning THEIR provider — the connect then lands in TronLink's
+// popup queue and the tile hangs on "connecting".
+//
+// So while we run MetaMask's connect we PIN window.ethereum with our own
+// accessor that always returns the strictly-identified MetaMask and swallows
+// writes, then restore the original property descriptor afterwards. The
+// hijacker's descriptor is configurable (verified against TronLink 4.10.6),
+// so redefining succeeds; if it isn't, we connect as-is and the build-time
+// provider-metamask patch is the backstop. No-op when MetaMask isn't
+// installed or already owns window.ethereum.
 export const withMetaMaskProviderOverride = async <T>(
   fn: () => Promise<T>,
 ): Promise<T> => {
@@ -114,18 +123,28 @@ export const withMetaMaskProviderOverride = async <T>(
   if (!real || !current || current === real || isStrictMetaMask(current)) {
     return fn();
   }
+  const desc = Object.getOwnPropertyDescriptor(window, "ethereum");
   try {
-    (window as any).ethereum = real;
+    Object.defineProperty(window, "ethereum", {
+      configurable: true,
+      enumerable: desc?.enumerable ?? true,
+      get: () => real,
+      set: () => {}, // swallow hijacker re-writes while pinned
+    });
   } catch {
-    return fn(); // non-writable injection point — connect as-is
+    return fn(); // non-configurable injection point — connect as-is
   }
   try {
     return await fn();
   } finally {
     try {
-      (window as any).ethereum = current;
+      if (desc) {
+        Object.defineProperty(window, "ethereum", desc);
+      } else {
+        (window as any).ethereum = current;
+      }
     } catch {
-      // nothing sane to do — leave the corrected assignment in place
+      // nothing sane to do — leave the corrected accessor in place
     }
   }
 };
