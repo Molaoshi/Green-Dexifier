@@ -77,6 +77,9 @@ const METAMASK_IMPOSTOR_FLAGS = [
   "isApexWallet", "isAvalanche", "isBlockWallet", "isFordefi", "__XDEFI",
   "isOneInchIOSWallet", "isOneInchAndroidWallet", "isOpera", "isPortal",
   "isDefiant", "isTokenary", "isZeal", "isZerion",
+  // TronLink 4.x hijacks window.ethereum and spoofs isMetaMask on its own
+  // EVM provider (isTronLink=true gives it away).
+  "isTronLink",
 ];
 
 export const isStrictMetaMask = (provider: any): boolean =>

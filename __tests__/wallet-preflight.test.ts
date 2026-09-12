@@ -142,6 +142,27 @@ describe("MetaMask impostor handling", () => {
     expect(findMetaMaskProvider()).toBeNull();
   });
 
+  it("findMetaMaskProvider skips a TronLink hijacker that spoofed isMetaMask", () => {
+    // TronLink 4.x installs a window.ethereum getter returning its own EVM
+    // provider (isTronLink=true AND isMetaMask=true) and pushes the real
+    // MetaMask into .providers. Strict resolution must still find MetaMask.
+    const mmRequest = vi.fn().mockResolvedValue(["0xmm"]);
+    const tronlinkEvm = { isTronLink: true, isMetaMask: true, request: vi.fn() };
+    const realMM = { isMetaMask: true, request: mmRequest };
+    win.window = { ethereum: { ...tronlinkEvm, providers: [realMM] } };
+    const found = findMetaMaskProvider();
+    expect(found).toBe(realMM);
+  });
+
+  it("isStrictMetaMask rejects the TronLink EVM provider even at window.ethereum", async () => {
+    // When a hijacker owns window.ethereum WITHOUT a .providers array, the
+    // fallback must refuse it instead of firing preflight at the wrong wallet.
+    const tlRequest = vi.fn().mockResolvedValue(["0xtl"]);
+    win.window = { ethereum: { isTronLink: true, isMetaMask: true, request: tlRequest } };
+    await preflightWalletUnlock("metamask");
+    expect(tlRequest).not.toHaveBeenCalled();
+  });
+
   it("withMetaMaskProviderOverride swaps window.ethereum during connect and restores after", async () => {
     const phantomEvm = { isPhantom: true, isMetaMask: true };
     const realMM = { isMetaMask: true };
