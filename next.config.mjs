@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+import { applyRangoMetamaskPatch } from "./scripts/patch-rango-metamask.mjs";
+
+// Vercel restores node_modules from cache without re-running postinstall
+// when the lockfile is unchanged — apply the Rango MetaMask patch at
+// config load so every build/dev start guarantees it is in place.
+applyRangoMetamaskPatch();
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
