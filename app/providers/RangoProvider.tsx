@@ -3,6 +3,7 @@
 import React from "react";
 import { WidgetProvider, WidgetConfig } from "@rango-dev/widget-embedded";
 import QueueManager from "./QueueManager";
+import SwapTracker from "@/app/_components/dexifier/SwapTracker";
 
 const DEXIFIER_CONFIG: WidgetConfig = {
   // apiUrl: 'https://api-edge.rango.exchange',
@@ -29,6 +30,7 @@ const RangoProvider = ({
   return (
     <WidgetProvider config={DEXIFIER_CONFIG}>
       <QueueManager apiKey={DEXIFIER_CONFIG.apiKey}>
+        <SwapTracker />
         {children}
       </QueueManager>
     </WidgetProvider>
