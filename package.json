@@ -18,6 +18,7 @@
   "dependencies": {
     "@hub3js/core": "^0.62.0",
     "@hub3js/namespaces": "^0.4.0",
+    "@nktkas/hyperliquid": "0.33.3",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@radix-ui/react-avatar": "^1.2.2",
@@ -46,6 +47,7 @@
     "ethers": "^6.17.0",
     "formik": "^2.4.9",
     "framer-motion": "^12.42.2",
+    "lightweight-charts": "5.2.1",
     "lodash": "^4.17.21",
     "lucide-react": "^1.25.0",
     "next": "^15.5.20",
