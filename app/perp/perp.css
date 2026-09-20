@@ -1,0 +1,156 @@
+/* Perp terminal — scoped under .perp-root. Uses Dexifier's neon-degen tokens
+   with trading semantics: brand emerald = up, red = down, muted gray = meta. */
+
+.perp-root {
+  --up: #13f187;
+  --down: #fb2c36;
+  --meta: #8f8f8f;
+  --panel: rgba(2, 8, 5, 0.6);
+  --line: rgba(19, 241, 135, 0.08);
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.perp-root .num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.perp-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.perp-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--meta);
+}
+
+/* Thin scrollbars for dense lists */
+.perp-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(19, 241, 135, 0.25) transparent;
+}
+.perp-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.perp-scroll::-webkit-scrollbar-thumb {
+  background: rgba(19, 241, 135, 0.22);
+  border-radius: 999px;
+}
+.perp-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Price tick flash — the only motion in the terminal (data, not decoration) */
+@keyframes perp-flash-up {
+  0% { color: var(--up); }
+  100% { color: inherit; }
+}
+@keyframes perp-flash-down {
+  0% { color: var(--down); }
+  100% { color: inherit; }
+}
+.perp-flash-up { animation: perp-flash-up 0.45s ease-out; }
+.perp-flash-down { animation: perp-flash-down 0.45s ease-out; }
+
+/* Order book depth bars */
+.perp-depth {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  right: 0;
+  pointer-events: none;
+}
+.perp-depth-bid { background: rgba(19, 241, 135, 0.09); }
+.perp-depth-ask { background: rgba(251, 44, 54, 0.09); }
+
+/* Range slider (leverage / size %) */
+.perp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(19, 241, 135, 0.18);
+  outline: none;
+}
+.perp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--up);
+  border: 2px solid #030a06;
+  box-shadow: 0 0 10px rgba(19, 241, 135, 0.5);
+  cursor: pointer;
+}
+.perp-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--up);
+  border: 2px solid #030a06;
+  cursor: pointer;
+}
+
+/* Inputs */
+.perp-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #f2f2f2;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.perp-input:focus {
+  border-color: rgba(19, 241, 135, 0.45);
+}
+.perp-input::placeholder {
+  color: rgba(143, 143, 143, 0.5);
+}
+
+/* Segmented tabs (Buy/Sell, Market/Limit, panel tabs) */
+.perp-seg {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+.perp-seg button {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--meta);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.perp-seg button:hover { color: #f2f2f2; }
+.perp-seg button.active {
+  background: rgba(19, 241, 135, 0.12);
+  color: var(--up);
+}
+.perp-seg button.active-red {
+  background: rgba(251, 44, 54, 0.12);
+  color: var(--down);
+}

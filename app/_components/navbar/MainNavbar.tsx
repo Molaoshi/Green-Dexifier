@@ -95,6 +95,15 @@ const MainNavbar = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Perps terminal */}
+            <Link
+              href="/perp"
+              aria-label="Trade perpetual futures"
+              className="group flex h-10 items-center gap-2 rounded-full border border-primary/40 bg-primary/[0.1] px-3 text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary transition-all duration-300 hover:bg-primary hover:text-black hover:shadow-neon sm:px-4"
+            >
+              Perps
+            </Link>
+
             {/* Support — Telegram channel */}
             <a
               href={SUPPORT_URL}
