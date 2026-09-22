@@ -1,21 +1,13 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
-.gitattributes
-
-# testing
-/coverage
+node_modules/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
+dist/
 
 # misc
 .DS_Store
@@ -26,14 +18,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
+# env files — never commit secrets
 .env
-
-# vercel
-.vercel
+.env*.local
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-/generated
+
+# prisma generated client
+generated/
+
+# vercel (legacy)
+.vercel

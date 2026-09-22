@@ -1,47 +1,33 @@
-# Dexifier
+# Dexifier Monorepo
 
-**Dexifier** is a cutting-edge Decentralized Exchange, dedicated to providing easy and infinite exchange routes, no matter on what chain or network, and without KYC or logins.
+All Dexifier products in one repository. Each app is self-contained (own
+`package.json` + lockfile) so one app's dependency changes can never break
+another's build. Shared code will live in `packages/` when a second consumer
+exists.
 
-## Project Overview
+## Layout
 
-### Easy & Infinite Exchange Routes
+- `apps/web` — dexifier.com swap front-end (Next.js 15, React 19, Prisma)
+- `apps/explorer` — explorer.dexifier.com swap explorer (Next.js 15 app router)
+- `packages/` — future shared packages (ui kit, design tokens)
 
-Dexifier automatically finds the fastest and cheapest trade routes for you. Swap between 65+ blockchains and thousands of coins without any limitations on what you can swap or trade.
+## Commands
 
-### Privacy Comes First
+```bash
+npm run dev:web         # dexifier.com app
+npm run dev:explorer    # explorer
+npm run build:web
+npm run build:explorer
+```
 
-At Dexifier, we believe in the unalienable right to privacy and freedom in the financial world. In a landscape cluttered with mandatory sign-ups and invasive KYC checks, we stand apart. Dexifier is your gateway to a decentralized exchange experience that fiercely protects your anonymity and financial privacy.
+## Deployment
 
-- **No Logins, No Cookies, No KYC -- EVER.**
-- No logins/signups
-- No cookies
-- No KYC
+Both apps deploy to Railway as separate services with the service root
+directory set to the app's folder (`apps/web`, `apps/explorer`).
 
-### 24/7 Customer Support
+## Rules
 
-Having trouble with a swap? Head to our Discord, open a ticket or ask a question. Our international team and community are ready to help, around the clock.
-
-- [Join Discord](#)
-
-### Wallets & Projects Supported
-
-Dexifier supports a wide range of wallets and projects including, but not limited to:
-
-- xDefi
-- MetaMask
-- Phantom
-- Keplr
-- TronLink
-- Apptopia
-- Rango
-- Thor
-- Maya
-- 1inch
-- Across
-- Many More...
-
-Join Dexifier and experience the next level of decentralized exchange with complete privacy and unparalleled support.
-
----
-
-For more information, visit our [website](#www.dexifier.com).
+- Secrets live in Railway env vars only — never in files, commits, or docs.
+- `main` is protected; all work lands via PR from `dex/*`, `perp/*`, or
+  `explorer/*` branches.
+- No fake data anywhere: if a number can't be sourced, it isn't rendered.

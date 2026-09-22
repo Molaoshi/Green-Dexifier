@@ -1,0 +1,40 @@
+'use client'
+
+import React from "react";
+import { WidgetProvider, WidgetConfig } from "@rango-dev/widget-embedded";
+import QueueManager from "./QueueManager";
+import SwapTracker from "@/app/_components/dexifier/SwapTracker";
+
+const DEXIFIER_CONFIG: WidgetConfig = {
+  // apiUrl: 'https://api-edge.rango.exchange',
+  apiKey: process.env.NEXT_PUBLIC_RANGO_API_KEY_BASIC || process.env.NEXT_PUBLIC_RANGO_API_KEY || '',
+  title: 'Dexifier',
+  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '',
+  multiWallets: true,
+  excludeLiquiditySources: true,
+  customDestination: true,
+  trezorManifest: {
+    appUrl: 'https://widget.rango.exchange/',
+    email: 'hi+trezorwidget@rango.exchange',
+  },
+  tonConnect: {
+    manifestUrl: 'https://raw.githubusercontent.com/rango-exchange/assets/refs/heads/main/manifests/tonconnect/manifest.json'
+  },
+};
+
+const RangoProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return (
+    <WidgetProvider config={DEXIFIER_CONFIG}>
+      <QueueManager apiKey={DEXIFIER_CONFIG.apiKey}>
+        <SwapTracker />
+        {children}
+      </QueueManager>
+    </WidgetProvider>
+  );
+}
+
+export default RangoProvider

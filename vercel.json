@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/exolix/sync",
-      "schedule": "0 3 * * *"
-    }
-  ]
-}

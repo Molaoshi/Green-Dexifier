@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Currency {
+  id        Int     @id @default(autoincrement()) // Add an id field
+  code      String
+  name      String
+  icon      String?
+  notes     String?
+  networkId Int
+  network   Network @relation(fields: [networkId], references: [id], onDelete: Cascade)
+}
+
+model Network {
+  id               Int        @id @default(autoincrement())
+  network          String     @unique
+  name             String
+  shortName        String?
+  addressRegex     String?
+  notes            String?
+  isDefault        Boolean
+  decimal          Int?
+  icon             String?
+  blockExplorer    String?
+  depositMinAmount Float?
+  memoNeeded       Boolean
+  memoName         String?
+  memoRegex        String?
+  precision        Int
+  contract         String?
+  currencies       Currency[]
+}
+
+// Cross-provider swap tracking. One row per swap initiated on Dexifier,
+// recorded at creation time (Rango via widget events, Exolix/Chainflip via
+// their server-side API routes) and refreshed against provider status APIs.
+model Swap {
+  id               String   @id @default(cuid())
+  provider         String // "rango" | "exolix" | "chainflip"
+  externalId       String // rango requestId / exolix tx id / chainflip swap id
+  status           String   @default("running") // running | success | failed | refunded
+  fromChain        String
+  fromToken        String
+  fromAmount       String
+  toChain          String
+  toToken          String
+  toAmount         String? // expected at creation, actual on completion
+  depositAddress   String?
+  recipientAddress String?
+  depositHash      String?
+  settleHash       String?
+  feeUsd           Float?
+  extra            Json? // provider-specific payload (route steps, raw status)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([provider, externalId])
+  @@index([status])
+  @@index([createdAt])
+}
