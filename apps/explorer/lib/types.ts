@@ -36,7 +36,7 @@ export interface SwapSummary {
   totalTxCount: number;
   last24HoursTxCount: number;
   connectedWallets: number;
-  dailyInterval: { date: string; count: number }[];
+  dailyInterval: { day: string; count: number }[];
 }
 
 // Statistics page (Rango scanner via server proxy).
