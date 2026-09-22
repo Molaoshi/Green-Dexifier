@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #f2f2f2;
+  background-color: #020a05;
+}
+
+/* ---------- Dexifier design system (mirrors apps/web) ---------- */
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.font-display {
+  font-family: var(--font-display), inherit;
+}
+
+.text-glow {
+  text-shadow: 0 0 18px rgba(19, 241, 135, 0.45);
+}
+
+.glass-card {
+  background: linear-gradient(
+    165deg,
+    rgba(19, 241, 135, 0.07),
+    rgba(19, 241, 135, 0.02) 45%,
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(19, 241, 135, 0.16);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ---- Ambient aurora background (static, cheap) ---- */
+.aurora-orb {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.aurora-orb-1 {
+  width: 38vw;
+  height: 38vw;
+  left: -12vw;
+  top: -14vw;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(15, 189, 107, 0.32) 0%,
+    rgba(15, 189, 107, 0.12) 38%,
+    transparent 70%
+  );
+  filter: blur(70px);
+}
+
+.aurora-orb-2 {
+  width: 44vw;
+  height: 44vw;
+  right: -16vw;
+  bottom: -20vw;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 224, 160, 0.22) 0%,
+    rgba(0, 224, 160, 0.08) 36%,
+    transparent 70%
+  );
+  filter: blur(80px);
+}
+
+/* Thin neon scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(19, 241, 135, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(19, 241, 135, 0.45);
+}
