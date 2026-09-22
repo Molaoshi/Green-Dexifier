@@ -13,7 +13,8 @@ export default async function HomePage() {
   const [summary, swapsData] = await Promise.all([getSummary(), getSwaps(0)]);
 
   const daily = (summary?.dailyInterval ?? [])
-    .map((d) => ({ date: d.date, count: d.count }))
+    .map((d) => ({ date: d.day, count: d.count }))
+    .filter((d) => Boolean(d.date))
     .sort((a, b) => a.date.localeCompare(b.date));
 
   return (
